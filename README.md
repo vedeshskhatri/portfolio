@@ -1,6 +1,3 @@
-# Crazy Portfolio Website
-
-This is a code bundle for Crazy Portfolio Website. The original project is available at https://www.figma.com/design/2oocRTvszehSjP2KBxEIrU/Crazy-Portfolio-Website.
 
 ## Running the code
 

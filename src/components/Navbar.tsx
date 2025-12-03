@@ -1,0 +1,99 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
+import { Menu, X } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { currentTheme } = useTheme();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navItems = ['Home', 'About', 'Skills', 'Projects', 'Contact'];
+
+  const scrollToSection = (item: string) => {
+    const element = document.getElementById(item.toLowerCase());
+    element?.scrollIntoView({ behavior: 'smooth' });
+    setIsMobileMenuOpen(false);
+  };
+
+  return (
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? `${currentTheme.navBg} backdrop-blur-lg shadow-lg` : ''
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex justify-between items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className={`text-2xl bg-gradient-to-r ${currentTheme.accent1} bg-clip-text text-transparent`}
+          >
+            VK<span className={currentTheme.textPrimary}>.</span>
+          </motion.div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex gap-8">
+            {navItems.map((item, index) => (
+              <motion.button
+                key={item}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                onClick={() => scrollToSection(item)}
+                className="relative group cursor-pointer"
+              >
+                <span className={`${currentTheme.textSecondary} group-hover:${currentTheme.textPrimary} transition-colors`}>
+                  {item}
+                </span>
+                <motion.div
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r ${currentTheme.accent1}`}
+                  initial={{ width: 0 }}
+                  whileHover={{ width: '100%' }}
+                />
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className={`md:hidden ${currentTheme.textPrimary}`}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden mt-4 pb-4"
+          >
+            {navItems.map((item) => (
+              <button
+                key={item}
+                onClick={() => scrollToSection(item)}
+                className={`block w-full text-left py-2 ${currentTheme.textSecondary} hover:${currentTheme.textPrimary} transition-colors`}
+              >
+                {item}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </div>
+    </motion.nav>
+  );
+}
